@@ -2,6 +2,7 @@ package config
 
 import (
 	"bytes"
+	"github.com/bketelsen/crypt/backend/zookeeper"
 	"io"
 	"io/ioutil"
 
@@ -75,6 +76,16 @@ func NewStandardConsulConfigManager(machines []string) (ConfigManager, error) {
 	return NewStandardConfigManager(store)
 }
 
+// NewStandardZookeeperConfigManager returns a new ConfigManager backed by Zookeeper.
+// Data will be encrypted.
+func NewStandardZookeeperConfigManager(machines []string) (ConfigManager, error) {
+	store, err := zookeeper.New(machines)
+	if err != nil {
+		return nil, err
+	}
+	return NewStandardConfigManager(store)
+}
+
 // NewFirestoreConfigManager returns a new ConfigManager backed by Firestore.
 // Data will be encrypted.
 func NewFirestoreConfigManager(machines []string, keystore io.Reader) (ConfigManager, error) {
@@ -99,6 +110,16 @@ func NewEtcdConfigManager(machines []string, keystore io.Reader) (ConfigManager,
 // Data will be encrypted.
 func NewConsulConfigManager(machines []string, keystore io.Reader) (ConfigManager, error) {
 	store, err := consul.New(machines)
+	if err != nil {
+		return nil, err
+	}
+	return NewConfigManager(store, keystore)
+}
+
+// NewZookeeperConfigManager returns a new ConfigManager backed by zookeeper.
+// Data will be encrypted.
+func NewZookeeperConfigManager(machines []string, keystore io.Reader) (ConfigManager, error) {
+	store, err := zookeeper.New(machines)
 	if err != nil {
 		return nil, err
 	}
